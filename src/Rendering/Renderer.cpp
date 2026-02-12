@@ -91,7 +91,7 @@ void Renderer::BeginBatch()
     QuadCount = 0;
 }
 
-void Renderer::DrawSquare(float x, float y, float size, float r, float g, float b, float a)
+void Renderer::DrawSquare(float x, float y, float size, float width, float r, float g, float b, float a)
 {
     if (QuadCount >= MaxQuads)
     {
@@ -99,9 +99,9 @@ void Renderer::DrawSquare(float x, float y, float size, float r, float g, float 
         return;
     }
 
-    float halfSize = size / 2.0f;
-
-    float halfWidth = halfSize / m_AspectRatio;
+    float halfSize = size / 2.5f;
+    float halfWidth = width / 2.5f;
+    halfWidth = halfWidth / m_AspectRatio;
 
     // Bottom left
     Vertices.push_back({ x - halfWidth, y - halfSize, r, g, b, a, 0.0f, 0.0f, 0.0f });
@@ -129,7 +129,7 @@ void Renderer::DrawCircle(float x, float y, float radius, float r, float g, floa
         return;
     }
 
-    float halfSize = radius / 2.0f;
+    float halfSize = radius / 3.5f;
 
     float halfWidth = halfSize / m_AspectRatio;
 

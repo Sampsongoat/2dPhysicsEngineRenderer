@@ -3,17 +3,23 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "Rendering/PhysicsEngine.h"
+#include "Rendering/PhysicsRenderer.h"
 #include "Rendering/Renderer.h"
 
 PhysicsEngine::PhysicsEngine(int width, int height, const char* title)
-	: m_Width(width), m_Height(height), m_Window(nullptr)
+	: m_Width(width), m_Height(height), m_Window(nullptr), m_PhysicsMath(nullptr)
 {
 	srand(static_cast<unsigned int>(time(nullptr)));
 }
 
 PhysicsEngine::~PhysicsEngine()
 {
+	if (m_PhysicsMath)
+	{
+		delete m_PhysicsMath;
+		m_PhysicsMath = nullptr;
+	}
+
 	if (m_Window)
 	{
 		glfwTerminate();
@@ -55,8 +61,16 @@ bool PhysicsEngine::Init(const char* title)
 
 	float scale = m_Height / 480.0f;
 
+	float gravity = 0.0005f;
+	float groundPosition = -3.0;
+	float groundHeight = 1.8 * scale;
+	float bounceLevel = 0.5;
+	float groundWidth = 1.5;
+
+	m_PhysicsMath = new Physics(gravity, groundPosition, groundHeight, groundWidth, bounceLevel);
+
 	// Remove later, Just a rectangle at bottom of screen
-	m_Shapes.push_back({ShapeType::Square, 0.0f, -3.0f, 1.8f * scale, 1.0f, 1.0f, 1.0f, 1.0f });
+	m_Shapes.push_back({ShapeType::Square, 0.0f, groundPosition, groundHeight, groundWidth, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
 
 	return true;
 }
@@ -75,6 +89,7 @@ int PhysicsEngine::Run()
 
 	while (!glfwWindowShouldClose(m_Window))
 	{
+		m_PhysicsMath->Update(m_Shapes);
 		// Step one: clear screen
 		renderer.Clear();
 
@@ -86,7 +101,7 @@ int PhysicsEngine::Run()
 		{
 			if (shape.shape == ShapeType::Square)
 			{
-				renderer.DrawSquare(shape.x, shape.y, shape.size,
+				renderer.DrawSquare(shape.x, shape.y, shape.size, shape.size,
 					shape.r, shape.g, shape.b, shape.a);
 			}
 			else if (shape.shape == ShapeType::Circle)

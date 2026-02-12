@@ -46,8 +46,12 @@ struct Vertex {
 struct Shape {
 	ShapeType shape;
 	float x, y;
+	// Also Height
 	float size;
+	float width;
 	float r, g, b, a;
+	float xVcty, yVcty;
+	bool noMovement;
 };
 
 class Renderer
@@ -74,7 +78,7 @@ public:
 	void SetAspectRatio(float aspectRatio);
 
 	void BeginBatch();
-	void DrawSquare(float x, float y, float size, float r, float g, float b, float a);
+	void DrawSquare(float x, float y, float size, float width, float r, float g, float b, float a);
 	void DrawCircle(float x, float y, float radius, float r, float g, float b, float a);
 	void EndBatch();
 };
