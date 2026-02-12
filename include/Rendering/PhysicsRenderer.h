@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Rendering/Renderer.h"
-#include "Physics/PhysicsMath.h"
+#include "Physics/PhysicsLayer.h"
 
 class PhysicsEngine
 {
@@ -15,7 +15,7 @@ private:
 
 	// Struct Holding: shape, xPos, yPos, size/radius, r, g, b, a)
 	std::vector<Shape> m_Shapes;
-	Physics* m_PhysicsMath;
+	Physics* m_PhysicsLayer;
 
 public:
 	PhysicsEngine(int width, int height, const char* title);

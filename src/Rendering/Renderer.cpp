@@ -99,9 +99,32 @@ void Renderer::DrawSquare(float x, float y, float size, float width, float r, fl
         return;
     }
 
-    float halfSize = size / 2.5f;
-    float halfWidth = width / 2.5f;
+    float halfSize = size / 2.0f;
+    float halfWidth = width / 2.0f;
     halfWidth = halfWidth / m_AspectRatio;
+
+    // Bottom left
+    Vertices.push_back({ x - halfWidth, y - halfSize, r, g, b, a, 0.0f, 0.0f, 0.0f });
+    // Bottom right
+    Vertices.push_back({ x + halfWidth, y - halfSize, r, g, b, a, 1.0f, 0.0f, 0.0f });
+    // Top right
+    Vertices.push_back({ x + halfWidth, y + halfSize, r, g, b, a, 1.0f, 1.0f, 0.0f });
+    // Top left
+    Vertices.push_back({ x - halfWidth, y + halfSize, r, g, b, a, 0.0f, 1.0f, 0.0f });
+
+
+    QuadCount++;
+}
+
+void Renderer::DrawRectangle(float x, float y, float size, float width, float r, float g, float b, float a) {
+    if (QuadCount >= MaxQuads)
+    {
+        // No more cause max Quads
+        return;
+    }
+
+    float halfSize = size / 2.0f;
+    float halfWidth = width / 2.0f;
 
     // Bottom left
     Vertices.push_back({ x - halfWidth, y - halfSize, r, g, b, a, 0.0f, 0.0f, 0.0f });

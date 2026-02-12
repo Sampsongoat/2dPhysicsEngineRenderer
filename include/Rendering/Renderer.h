@@ -9,7 +9,7 @@
 #include <sstream>
 #include <vector>
 
-enum class ShapeType { Square, Circle };
+enum class ShapeType { Square, Circle, Rectangle };
 
 // Forward Declarations to avoid circular dependencies issues
 class VertexArray;
@@ -46,7 +46,7 @@ struct Vertex {
 struct Shape {
 	ShapeType shape;
 	float x, y;
-	// Also Height
+	// Also size = width
 	float size;
 	float width;
 	float r, g, b, a;
@@ -79,6 +79,7 @@ public:
 
 	void BeginBatch();
 	void DrawSquare(float x, float y, float size, float width, float r, float g, float b, float a);
+	void DrawRectangle(float x, float y, float size, float width, float r, float g, float b, float a);
 	void DrawCircle(float x, float y, float radius, float r, float g, float b, float a);
 	void EndBatch();
 };

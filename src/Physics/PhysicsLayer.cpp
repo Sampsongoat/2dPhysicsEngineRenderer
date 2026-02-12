@@ -1,4 +1,4 @@
-#include "Physics/PhysicsMath.h"
+#include "Physics/PhysicsLayer.h"
 
 Physics::Physics(float gravity, float groundPosition, float groundHeight, float groundWidth, float bounceLevel)
 	: m_Gravity(gravity), m_GroundPosition(groundPosition),
@@ -51,16 +51,33 @@ void Physics::CheckGroundCollision(Shape& shape)
 	float groundLeftBoundary = 0.0 - (m_GroundWidth / 2);
 	float groundRightBoundary = 0.0 + (m_GroundWidth / 2);
 
-	float bottomOfShape = shape.y - (shape.size / 2);
-	float leftOfShape = shape.x - (shape.size / 2);
-	float rightOfShape = shape.x + (shape.size / 2);
+	float halfHeight, halfWidth;
+	if (shape.shape == ShapeType::Circle)
+	{
+		halfHeight = shape.size / 3.5f;
+		halfWidth = shape.size / 3.5f;
+	}
+	else if (shape.shape == ShapeType::Square)
+	{
+		halfHeight = shape.size / 2.0f;
+		halfWidth = shape.size / 2.0f;
+	}
+	else
+	{
+		halfHeight = shape.size / 2.0f;
+		halfWidth = shape.size / 2.0f;
+	}
+
+	float bottomOfShape = shape.y - halfHeight;
+	float leftOfShape = shape.x - halfWidth;
+	float rightOfShape = shape.x + halfWidth;
 
 	bool isAboveGround = (bottomOfShape <= topOfGround);
-	bool isWithinGroundWidth = (leftOfShape > groundLeftBoundary && rightOfShape < groundRightBoundary);
+	bool isWithinGroundWidth = (rightOfShape > groundLeftBoundary && leftOfShape < groundRightBoundary);
 
 	if (isAboveGround && isWithinGroundWidth)
 	{
-		shape.y = topOfGround + (shape.size / 2.0f);
+		shape.y = topOfGround + halfHeight;
 
 		if (shape.yVcty < 0.0f)
 		{

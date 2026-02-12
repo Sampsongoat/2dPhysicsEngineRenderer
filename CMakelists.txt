@@ -76,7 +76,7 @@ else()
 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/Rendering/Renderer.cpp" "include/Rendering/Renderer.h" "include/Rendering/VertexBuffer.h" "src/Rendering/VertexBuffer.cpp" "include/Rendering/VertexArray.h" "src/Rendering/VertexArray.cpp" "include/Rendering/VertexBufferLayout.h" "include/Rendering/Shader.h" "src/Rendering/Shader.cpp" "src/Game/PhysicsEngine.cpp" "src/Physics/PhysicsMath.cpp" "include/Physics/PhysicsMath.h")
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES}  "src/Rendering/Renderer.cpp" "include/Rendering/Renderer.h" "include/Rendering/VertexBuffer.h" "src/Rendering/VertexBuffer.cpp" "include/Rendering/VertexArray.h" "src/Rendering/VertexArray.cpp" "include/Rendering/VertexBufferLayout.h" "include/Rendering/Shader.h" "src/Rendering/Shader.cpp" "src/Game/PhysicsEngine.cpp" "src/Physics/PhysicsLayer.cpp" "include/Physics/PhysicsLayer.h")
 
 if(MSVC) # If using the VS compiler...
 
