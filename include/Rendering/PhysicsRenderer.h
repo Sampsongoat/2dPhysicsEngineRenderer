@@ -17,6 +17,9 @@ private:
 	std::vector<Shape> m_Shapes;
 	Physics* m_PhysicsLayer;
 
+	float m_Dt;
+	float m_LastFrameTime;
+
 public:
 	PhysicsEngine(int width, int height, const char* title);
 	~PhysicsEngine();

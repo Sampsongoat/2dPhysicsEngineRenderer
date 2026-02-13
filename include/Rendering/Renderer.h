@@ -46,7 +46,6 @@ struct Vertex {
 struct Shape {
 	ShapeType shape;
 	float x, y;
-	// Also size = width
 	float size;
 	float width;
 	float r, g, b, a;

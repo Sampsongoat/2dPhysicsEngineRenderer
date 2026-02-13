@@ -1,8 +1,9 @@
 #include "Physics/PhysicsLayer.h"
+#include <cmath>
 
 Physics::Physics(float gravity, float groundPosition, float groundHeight, float groundWidth, float bounceLevel, float aspectRatio)
-	: m_Gravity(gravity), m_GroundPosition(groundPosition),
-	m_GroundHeight(groundHeight), m_GroundWidth(groundWidth), m_BounceLevel(bounceLevel), m_AspectRatio(aspectRatio)
+	: m_Gravity(gravity), m_GroundPosition(groundPosition),m_GroundHeight(groundHeight), m_GroundWidth(groundWidth), 
+	m_BounceLevel(bounceLevel), m_AspectRatio(aspectRatio), m_Restitution(0.7f), m_VelocityThreshold(0.0001f)
 {
 }
 
@@ -10,7 +11,7 @@ Physics::~Physics()
 {
 }
 
-void Physics::Update(std::vector<Shape>& shapes)
+void Physics::Update(std::vector<Shape>& shapes, float dt)
 {
 	for (auto& shape : shapes)
 	{
@@ -19,9 +20,11 @@ void Physics::Update(std::vector<Shape>& shapes)
 			continue;
 		}
 		ApplyGravity(shape);
-		UpdatePosition(shape);
+		UpdatePosition(shape, dt);
 		CheckGroundCollision(shape);
 	}
+
+	// UpdateObjectCollisions(shapes); Finish when collision functions are done
 }
 
 void Physics::SetGravity(float gravity)
@@ -39,10 +42,52 @@ void Physics::ApplyGravity(Shape& shape)
 	shape.yVcty = shape.yVcty - m_Gravity;
 }
 
-void Physics::UpdatePosition(Shape& shape)
+void Physics::UpdatePosition(Shape& shape, float dt)
 {
-	shape.x = shape.x + shape.xVcty;
-	shape.y = shape.y + shape.yVcty;
+	shape.x = shape.x + (shape.xVcty * dt);
+	shape.y = shape.y + (shape.yVcty * dt);
+}
+
+void Physics::UpdateObjectCollisions(std::vector<Shape>& shapes)
+{
+	for (int i = 0; i < shapes.size() - 1; i++)
+	{
+		for (int j = i + 1; j < shapes.size(); j++)
+		{
+
+		}
+	}
+}
+
+void Physics::CheckCircleCollision(Shape& circle1, Shape& circle2)
+{
+	// distance between two circles center points
+	float dx = circle2.x - circle1.x;
+	float dy = circle2.y - circle1.y;
+	float dist = sqrt(pow(dx, 2) + pow(dy, 2));
+
+	// distance of radius of circles combined
+	float radius1 = circle1.size / 3.5f;
+	float radius2 = circle2.size / 3.5f;
+	float distanceBetween = radius1 + radius2;
+
+	if (dist < distanceBetween)
+	{
+		if (dist > 0)
+		{
+			
+		}
+	}
+}
+
+void Physics::CheckSquareCollision(Shape& square1, Shape& square2)
+{
+
+}
+
+void Physics::CheckCircleSquareCollision(Shape& circle, Shape& square)
+{
+
 }
 
 void Physics::CheckGroundCollision(Shape& shape)

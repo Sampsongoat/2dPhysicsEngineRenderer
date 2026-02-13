@@ -7,7 +7,8 @@
 #include "Rendering/Renderer.h"
 
 PhysicsEngine::PhysicsEngine(int width, int height, const char* title)
-	: m_Width(width), m_Height(height), m_Window(nullptr), m_PhysicsLayer(nullptr)
+	: m_Width(width), m_Height(height), m_Window(nullptr), m_PhysicsLayer(nullptr),
+	m_LastFrameTime(0.05f), m_Dt(0.0f)
 {
 	srand(static_cast<unsigned int>(time(nullptr)));
 }
@@ -62,11 +63,11 @@ bool PhysicsEngine::Init(const char* title)
 	float scale = m_Height / 480.0f;
 	float aspectRatio = static_cast<float>(m_Width) / static_cast<float>(m_Height);
 
-	float gravity = 0.0005f;
-	float groundPosition = -0.8;
+	float gravity = 0.01f;
+	float groundPosition = -1.0;
 	float groundHeight = 0.2;
 	float bounceLevel = 0.5;
-	float groundWidth = 1.6f;  // Un-compensated width, renderer will apply aspect ratio
+	float groundWidth = 1.6f;  
 
 	m_PhysicsLayer = new Physics(gravity, groundPosition, groundHeight, groundWidth, bounceLevel, aspectRatio);
 
@@ -89,9 +90,20 @@ int PhysicsEngine::Run()
 	float aspectRatio = static_cast<float>(m_Width) / static_cast<float>(m_Height);
 	renderer.SetAspectRatio(aspectRatio);
 
+	m_LastFrameTime = static_cast<float>(glfwGetTime());
+
 	while (!glfwWindowShouldClose(m_Window))
 	{
-		m_PhysicsLayer->Update(m_Shapes);
+		float currTime = static_cast<float>(glfwGetTime());
+		m_Dt = currTime - m_LastFrameTime;
+		m_LastFrameTime = currTime;
+
+		if (m_Dt > 0.05f)
+		{
+			m_Dt = 0.05f;
+		}
+
+		m_PhysicsLayer->Update(m_Shapes, m_Dt);
 		// Step one: clear screen
 		renderer.Clear();
 
@@ -147,7 +159,7 @@ void PhysicsEngine::OnMouseLeftClick(double clickXPos, double clickYPos)
 	// Flipped for Y but same as X overall
 	float y = -((clickYPos / m_Height) * 2.0f - 1.0f);
 
-	float scale = m_Height / 480.0f;
+	float scale = m_Height / 1920.0f;
 
 	float r = static_cast<float>(rand()) / RAND_MAX;
 	float g = static_cast<float>(rand()) / RAND_MAX;
