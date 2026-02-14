@@ -167,8 +167,7 @@ void PhysicsEngine::OnMouseLeftClick(double clickXPos, double clickYPos)
 	// Flipped for Y but same as X overall
 	float y = -((clickYPos / m_Height) * 2.0f - 1.0f);
 
-	float randomSize = (float)(rand() % 9 + 1.3) * 480.0f;
-
+	float randomSize = (float)(rand() % 960 + 480.0);
 	float scale = m_Height / randomSize;
 
 	float r = static_cast<float>(rand()) / RAND_MAX;

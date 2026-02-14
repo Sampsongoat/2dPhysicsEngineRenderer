@@ -310,8 +310,8 @@ void Physics::ApplyGroundCollision(Shape& shape)
 	float halfHeight, halfWidth;
 	if (shape.shape == ShapeType::Circle)
 	{
-		halfHeight = shape.size / 3.75f;
-		halfWidth = (shape.size / 3.75f) / m_AspectRatio;
+		halfHeight = shape.size / 3.5f;
+		halfWidth = (shape.size / 3.5f) / m_AspectRatio;
 	}
 	else if (shape.shape == ShapeType::Square)
 	{
@@ -364,8 +364,8 @@ void Physics::ApplyWallCollision(Shape& shape)
 
 	if (shape.shape == ShapeType::Circle)
 	{
-		shapeHalfWidth = (shape.size / 3.75f) / m_AspectRatio;
-		shapeHalfHeight = (shape.size / 3.75f);
+		shapeHalfWidth = (shape.size / 3.5f) / m_AspectRatio;
+		shapeHalfHeight = (shape.size / 3.5f);
 	}
 	else if (shape.shape == ShapeType::Square)
 	{
