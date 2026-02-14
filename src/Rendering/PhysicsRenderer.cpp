@@ -77,9 +77,11 @@ bool PhysicsEngine::Init(const char* title)
 
 	m_Shapes.push_back({ ShapeType::Wall, -0.8f, -0.5f, 1.0f, 0.07f,
 		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
+	m_PhysicsLayer->AddWall(-0.8, -0.5, 0.07, 1.0);
 
 	m_Shapes.push_back({ ShapeType::Wall, 0.8f, -0.5f, 1.0f, 0.07f,
 		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
+	m_PhysicsLayer->AddWall(0.8, -0.5, 0.07, 1.0);
 
 	return true;
 }
@@ -165,13 +167,17 @@ void PhysicsEngine::OnMouseLeftClick(double clickXPos, double clickYPos)
 	// Flipped for Y but same as X overall
 	float y = -((clickYPos / m_Height) * 2.0f - 1.0f);
 
-	float scale = m_Height / 1920.0f;
+	float randomSize = (float)(rand() % 9 + 1.3) * 480.0f;
+
+	float scale = m_Height / randomSize;
 
 	float r = static_cast<float>(rand()) / RAND_MAX;
 	float g = static_cast<float>(rand()) / RAND_MAX;
 	float b = static_cast<float>(rand()) / RAND_MAX;
 
-	bool isCircle = (rand() % 2) == 0;
+	//bool isCircle = (rand() % 2) == 0;
+
+	bool isCircle = 1;
 
 	if (isCircle)
 	{

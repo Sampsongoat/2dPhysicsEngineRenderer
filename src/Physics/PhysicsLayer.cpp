@@ -22,6 +22,7 @@ void Physics::Update(std::vector<Shape>& shapes, float dt)
 		ApplyGravity(shape);
 		UpdatePosition(shape, dt);
 		ApplyGroundCollision(shape);
+		ApplyWallCollision(shape);
 	}
 
 	UpdateObjectCollisions(shapes);
@@ -29,6 +30,31 @@ void Physics::Update(std::vector<Shape>& shapes, float dt)
 	for (auto& shape : shapes)
 	{
 		ApplyFriction(shape, shapes);
+	}
+}
+
+void Physics::UpdatePosition(Shape& shape, float dt)
+{
+	shape.x = shape.x + (shape.xVcty * dt);
+	shape.y = shape.y + (shape.yVcty * dt);
+}
+
+void Physics::UpdateObjectCollisions(std::vector<Shape>& shapes)
+{
+	for (int i = 0; i < shapes.size() - 1; i++)
+	{
+		for (int j = i + 1; j < shapes.size(); j++)
+		{
+			if (shapes[i].shape == ShapeType::Circle && shapes[j].shape == ShapeType::Circle)
+			{
+				ApplyCircleCollision(shapes[i], shapes[j]);
+			}
+
+			if (shapes[i].shape == ShapeType::Square && shapes[j].shape == ShapeType::Square)
+			{
+				ApplySquareCollision(shapes[i], shapes[j]);
+			}
+		}
 	}
 }
 
@@ -85,8 +111,10 @@ bool Physics::IsTouchingAnything(Shape& shape, std::vector<Shape>& shapes)
 		}
 		else if (shape.shape == ShapeType::Square && otherShape.shape == ShapeType::Square)
 		{
-			// CheckSquareCollision(shape, otherShape);
-			return true;
+			if (CheckSquareCollision(shape, otherShape))
+			{
+				return true;
+			}
 		}
 		else
 		{
@@ -138,24 +166,21 @@ bool Physics::CheckCircleCollision(Shape& circle1, Shape& circle2)
 	return true;
 }
 
-void Physics::UpdatePosition(Shape& shape, float dt)
+
+bool Physics::CheckSquareCollision(Shape& square1, Shape& square2)
 {
-	shape.x = shape.x + (shape.xVcty * dt);
-	shape.y = shape.y + (shape.yVcty * dt);
+	float halfWidth1 = (square1.size / 2.0f) / m_AspectRatio;
+	float halfHeight1 = square1.size / 2.0f;
+	float halfWidth2 = (square2.size / 2.0f) / m_AspectRatio;
+	float halfHeight2 = square2.size / 2.0f;
+
+	return ((abs(square1.x - square2.x) < (halfWidth1 + halfWidth2)) && (abs(square1.y - square2.y) < (halfHeight1 + halfHeight2)));
 }
 
-void Physics::UpdateObjectCollisions(std::vector<Shape>& shapes)
+
+bool Physics::CheckCircleSquareCollision(Shape& circle, Shape& square)
 {
-	for (int i = 0; i < shapes.size() - 1; i++)
-	{
-		for (int j = i + 1; j < shapes.size(); j++)
-		{
-			if (shapes[i].shape == ShapeType::Circle && shapes[j].shape == ShapeType::Circle)
-			{
-				ApplyCircleCollision(shapes[i], shapes[j]);
-			}
-		}
-	}
+	return false;
 }
 
 void Physics::ApplyCircleCollision(Shape& circle1, Shape& circle2)
@@ -215,12 +240,63 @@ void Physics::ApplyCircleCollision(Shape& circle1, Shape& circle2)
 	}
 }
 
-void Physics::CheckSquareCollision(Shape& square1, Shape& square2)
+void Physics::ApplySquareCollision(Shape& square1, Shape& square2)
 {
+	if (CheckSquareCollision(square1, square2))
+	{
+		float dx = square2.x - square1.x;
+		float dy = square2.y - square1.y;
 
+		float overlapX = (square1.size) / m_AspectRatio - abs(dx);
+		float overlapY = square1.size - abs(dy);
+
+		bool directionX = (dx > 0);
+		bool directionY = (dy > 0);
+
+		if (overlapX < overlapY)
+		{
+			if (directionX)
+			{
+				square1.x -= 1.0 * overlapX * 0.5f;
+				square2.x += 1.0 * overlapX * 0.5f;
+			}
+			else
+			{
+				square1.x -= -1.0 * overlapX * 0.5f;
+				square2.x += -1.0 * overlapX * 0.5f;
+			}
+
+			float relativeVelocityX = square2.xVcty - square1.xVcty;
+			float impulse = -(1 + m_Restitution) * relativeVelocityX;
+			impulse /= (1 / square1.size) + (1 / square2.size);
+
+			square1.xVcty -= impulse;
+			square2.xVcty += impulse;
+		}
+		else
+		{
+			if (directionY)
+			{
+				square1.y -= 1.0 * overlapY * 0.5f;
+				square2.y += 1.0 * overlapY * 0.5f;
+			}
+			else
+			{
+				square1.y -= -1.0 * overlapY * 0.5f;
+				square2.y += -1.0 * overlapY * 0.5f;
+			}
+
+			float relativeVelocityY = square2.yVcty - square1.yVcty;
+			float impulse = -(1 + m_Restitution) * relativeVelocityY;
+			impulse /= (1 / square1.size) + (1 / square2.size);
+
+			square1.yVcty -= impulse;
+			square2.yVcty += impulse;
+		}
+	}
 }
 
-void Physics::CheckCircleSquareCollision(Shape& circle, Shape& square)
+void Physics::ApplyCircleSquareCollision(Shape& circle, Shape& square)
 {
 
 }
@@ -271,7 +347,134 @@ void Physics::ApplyGroundCollision(Shape& shape)
 	}
 }
 
-void ApplyWallCollision(Shape& shape)
+void Physics::AddWall(float xPosition, float yPosition, float width, float height)
 {
+	m_Walls.push_back({xPosition, yPosition, width, height});
+}
 
+void Physics::ClearWalls()
+{
+	m_Walls.clear();
+}
+
+void Physics::ApplyWallCollision(Shape& shape)
+{
+	float shapeHalfWidth;
+	float shapeHalfHeight;
+
+	if (shape.shape == ShapeType::Circle)
+	{
+		shapeHalfWidth = (shape.size / 3.75f) / m_AspectRatio;
+		shapeHalfHeight = (shape.size / 3.75f);
+	}
+	else if (shape.shape == ShapeType::Square)
+	{
+		shapeHalfWidth = (shape.size / 2.0f) / m_AspectRatio;
+		shapeHalfHeight = (shape.size / 2.0f);
+	}
+	else
+	{
+		shapeHalfWidth = (shape.size / 2.0f) / m_AspectRatio;
+		shapeHalfHeight = (shape.size / 2.0f);
+	}
+
+	float leftOfShape = shape.x - shapeHalfWidth;
+	float rightOfShape = shape.x + shapeHalfWidth;
+	float topOfShape = shape.y + shapeHalfHeight;
+	float bottomOfShape = shape.y - shapeHalfHeight;
+
+	for (const auto& wall : m_Walls)
+	{
+		float wallHalfWidth = (wall.width / 2.0f) / m_AspectRatio;
+		float wallHalfHeight = (wall.height / 2.0f);
+		float wallLeftEdge = wall.xPosition - wallHalfWidth;
+		float wallRightEdge = wall.xPosition + wallHalfWidth;
+		float wallTopEdge = wall.yPosition + wallHalfHeight;
+		float wallBottomEdge = wall.yPosition - wallHalfHeight;
+
+		bool horizontalOverlap = (topOfShape > wallBottomEdge && bottomOfShape < wallTopEdge);
+		bool verticalOverlap = (rightOfShape > wallLeftEdge && leftOfShape < wallRightEdge);
+
+		// sideCollision is number from 0 - 3. 0 being bottom wall and going clockwise for rest
+		int sideCollision = 0;
+
+		if (horizontalOverlap && verticalOverlap)
+		{
+			float overlapLeft = rightOfShape - wallLeftEdge;
+			float overlapRight = wallRightEdge - leftOfShape;
+			float overlapTop = wallTopEdge - bottomOfShape;
+			float overlapBottom = topOfShape - wallBottomEdge;
+
+			float minOverlap = overlapLeft;
+
+			if (overlapRight < minOverlap)
+			{
+				minOverlap = overlapRight;
+				sideCollision = 1;
+			}
+			if (overlapTop < minOverlap)
+			{
+				minOverlap = overlapTop;
+				sideCollision = 2;
+			}
+			if (overlapBottom < minOverlap)
+			{
+				minOverlap = overlapBottom;
+				sideCollision = 3;
+			}
+
+			switch (sideCollision) {
+			case 0:
+				shape.x = wallLeftEdge - shapeHalfWidth;
+				if (shape.xVcty > 0.0f)
+				{
+					shape.xVcty = -shape.xVcty * m_BounceLevel;
+					if (abs(shape.xVcty) < m_VelocityThreshold)
+					{
+						shape.xVcty = 0.0f;
+					}
+				}
+				break;
+
+			case 1:
+				shape.x = wallRightEdge + shapeHalfWidth;
+				if (shape.xVcty < 0.0f)
+				{
+					shape.xVcty = -shape.xVcty * m_BounceLevel;
+					if (abs(shape.xVcty) < m_VelocityThreshold)
+					{
+						shape.xVcty = 0.0f;
+					}
+				}
+				break;
+
+			case 2:
+				shape.y = wallTopEdge + shapeHalfHeight;
+				if (shape.yVcty < 0.0f)
+				{
+					shape.yVcty = -shape.yVcty * m_BounceLevel;
+					if (abs(shape.yVcty) < m_VelocityThreshold)
+					{
+						shape.yVcty = 0.0f;
+					}
+				}
+				break;
+
+			case 3:
+				shape.y = wallBottomEdge - shapeHalfHeight;
+				if (shape.yVcty > 0.0f)
+				{
+					shape.yVcty = -shape.yVcty * m_BounceLevel;
+					if (abs(shape.yVcty) < m_VelocityThreshold)
+					{
+						shape.yVcty = 0.0f;
+					}
+				}
+				break;
+
+			default:
+				break;
+			}
+		}	
+	}
 }
