@@ -67,12 +67,18 @@ bool PhysicsEngine::Init(const char* title)
 	float groundPosition = -1.0;
 	float groundHeight = 0.2;
 	float bounceLevel = 0.5;
-	float groundWidth = 1.6f;  
+	float groundWidth = 2.95f;  
 
 	m_PhysicsLayer = new Physics(gravity, groundPosition, groundHeight, groundWidth, bounceLevel, aspectRatio);
 
 	// Remove later, Just a rectangle at bottom of screen
-	m_Shapes.push_back({ ShapeType::Rectangle, 0.0f, groundPosition, groundHeight, groundWidth,
+	m_Shapes.push_back({ ShapeType::Ground, 0.0f, groundPosition, groundHeight, groundWidth,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
+
+	m_Shapes.push_back({ ShapeType::Wall, -0.8f, -0.5f, 1.0f, 0.07f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
+
+	m_Shapes.push_back({ ShapeType::Wall, 0.8f, -0.5f, 1.0f, 0.07f,
 		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, true });
 
 	return true;
@@ -123,7 +129,7 @@ int PhysicsEngine::Run()
 				renderer.DrawCircle(shape.x, shape.y, shape.size,
 					shape.r, shape.g, shape.b, shape.a);
 			}
-			else if (shape.shape == ShapeType::Rectangle)
+			else if (shape.shape == ShapeType::Rectangle || shape.shape == ShapeType::Ground || shape.shape == ShapeType::Wall)
 			{
 				renderer.DrawRectangle(shape.x, shape.y, shape.size, shape.width,
 					shape.r, shape.g, shape.b, shape.a);

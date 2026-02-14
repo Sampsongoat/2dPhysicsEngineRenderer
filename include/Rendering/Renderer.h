@@ -9,7 +9,7 @@
 #include <sstream>
 #include <vector>
 
-enum class ShapeType { Square, Circle, Rectangle };
+enum class ShapeType { Square, Circle, Rectangle, Ground, Wall };
 
 // Forward Declarations to avoid circular dependencies issues
 class VertexArray;

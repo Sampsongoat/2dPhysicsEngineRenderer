@@ -24,13 +24,20 @@ public:
 	void SetBounceLevel(float bounceLevel);
 
 	// Collision functions
-	void Physics::CheckCircleCollision(Shape& circle1, Shape& circle2);
-	void Physics::CheckSquareCollision(Shape& square1, Shape& square2);
-	void Physics::CheckCircleSquareCollision(Shape& circle, Shape& square);
-	void Physics::UpdateObjectCollisions(std::vector<Shape>& shapes);
+
+	bool Physics::IsTouchingAnything(Shape& shape, std::vector<Shape>& shapes);
+	bool Physics::IsOnGround(Shape& shape);
+	bool CheckCircleCollision(Shape& circle1, Shape& circle2);
+	void ApplyCircleCollision(Shape& circle1, Shape& circle2);
+	void CheckSquareCollision(Shape& square1, Shape& square2);
+	void CheckCircleSquareCollision(Shape& circle, Shape& square);
+	void UpdateObjectCollisions(std::vector<Shape>& shapes);
 
 private:
 	void ApplyGravity(Shape& shape);
 	void UpdatePosition(Shape& shape, float dt);
-	void CheckGroundCollision(Shape& shape);
+	void ApplyGroundCollision(Shape& shape);
+	void ApplyWallCollision(Shape& shape);
+	void ApplyFriction(Shape& shape, std::vector<Shape>& shapes);
+
 };
